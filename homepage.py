@@ -1,23 +1,21 @@
 #!/usr/bin/env python
-
-"""
-    Demo - Simple Tabs
-
-    How to use the Tab Element and the TabGroup Element
-
-    Copyright 2021 PySimpleGUI
-"""
-
 import PySimpleGUI as sg
-# Simple example of TabGroup element and the options available to it
-sg.theme('Dark Red')     # Please always add color to your window
-# The tab 1, 2, 3 layouts - what goes inside the tab
+from time import sleep
 
+# Simple example of TabGroup element and the options available to it
+sg.theme('LightGreen3')     # Please always add color to your window
+# The tab 1, 2, 3 layouts - what goes inside the tab
 tab1_layout = [[sg.Button('Start Harvest'), sg.Button('Stop Harvest'), sg.Button('Reset System'), sg.Button('Reboot System')],
-               [sg.Text('Put your layout in here')],
-               [sg.Text('Input something'), sg.Input(size=(12,1), key='-IN-TAB1-')]]
+               [sg.Radio('Harvesting Tray 1', 1)],
+               [sg.Radio('Harvesting Tray 2', 2)],              
+               [sg.Text('Harvesting Tray In Progress')],
+               [sg.ProgressBar(1, orientation='h', size=(20, 20), key='progress')],
+               [sg.Cancel()]]
+
 
 tab2_layout = [[sg.Text('Diagnostic')]]
+
+
 tab3_layout = [[sg.Text('Output')]]
 
 # The TabgGroup layout - it must contain only Tabs
@@ -32,7 +30,21 @@ layout = [[sg.TabGroup(tab_group_layout,
                        key='-TABGROUP-')]]
           #[sg.Button('Start Harvest'), sg.Button('Stop Harvest'), sg.Button('Reboot System')]
 
-window = sg.Window('Automated Harvesting Tray Retrieval', layout, no_titlebar=False)
+window = sg.Window('Automated Harvesting Tray Retrieval', layout, no_titlebar=False) 
+
+
+def HarvestingTrayProgressBar():
+    progress_bar = window['progress']
+    # loop that would normally do something useful
+    for i in range(10000):
+        # check to see if the cancel button was clicked and exit loop if clicked
+        event, values = window.read(timeout=0)
+        if event == 'Cancel' or event == None:
+            break
+        # update bar with loop value +1 so that bar eventually reaches the maximum
+        progress_bar.update_bar(i+1, 10000)
+    # done with loop... need to destroy the window as it's still open
+
 
 tab_keys = ('-TAB1-','-TAB2-','-TAB3-')         # map from an input value to a key
 while True:
@@ -49,4 +61,7 @@ while True:
         window[tab_keys[int(values['-IN-'])-1]].select()      
     if event == 'Reboot System':
         window[tab_keys[int(values['-IN-'])-1]].select()
+    HarvestingTrayProgressBar()
+
+
 window.close()
